@@ -17,7 +17,7 @@ export default defineConfig({
         description: 'Defense type effectiveness visualizer for Pokémon GO',
         theme_color: '#f3f4f6',
         background_color: '#f3f4f6',
-        display: 'fullscreen',
+        display: 'standalone',
         icons: [
           {
             src: 'pwa-192x192.png',
