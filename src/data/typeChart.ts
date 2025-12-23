@@ -28,26 +28,29 @@ export const NOT_EFFECTIVE = 0.625        // いまひとつ
 export const IMMUNE = 0.390625            // 効果なし（本編の無効 = 0.625^2）
 export const NEUTRAL = 1                   // 等倍
 
+// アイコンパスのベースURL
+const BASE_URL = import.meta.env.BASE_URL
+
 // 18タイプの情報
 export const TYPE_INFO: Record<PokemonType, TypeInfo> = {
-  normal:   { id: 'normal',   name: 'ノーマル',   color: 'bg-gray-400',    textColor: 'text-gray-800', iconPath: '/icons/01.svg' },
-  fire:     { id: 'fire',     name: 'ほのお',     color: 'bg-orange-500',  textColor: 'text-white',    iconPath: '/icons/02.svg' },
-  water:    { id: 'water',    name: 'みず',       color: 'bg-blue-500',    textColor: 'text-white',    iconPath: '/icons/03.svg' },
-  electric: { id: 'electric', name: 'でんき',     color: 'bg-yellow-400',  textColor: 'text-gray-800', iconPath: '/icons/04.svg' },
-  grass:    { id: 'grass',    name: 'くさ',       color: 'bg-green-500',   textColor: 'text-white',    iconPath: '/icons/05.svg' },
-  ice:      { id: 'ice',      name: 'こおり',     color: 'bg-cyan-300',    textColor: 'text-gray-800', iconPath: '/icons/06.svg' },
-  fighting: { id: 'fighting', name: 'かくとう',   color: 'bg-red-700',     textColor: 'text-white',    iconPath: '/icons/07.svg' },
-  poison:   { id: 'poison',   name: 'どく',       color: 'bg-purple-500',  textColor: 'text-white',    iconPath: '/icons/08.svg' },
-  ground:   { id: 'ground',   name: 'じめん',     color: 'bg-amber-600',   textColor: 'text-white',    iconPath: '/icons/09.svg' },
-  flying:   { id: 'flying',   name: 'ひこう',     color: 'bg-indigo-300',  textColor: 'text-gray-800', iconPath: '/icons/10.svg' },
-  psychic:  { id: 'psychic',  name: 'エスパー',   color: 'bg-pink-500',    textColor: 'text-white',    iconPath: '/icons/11.svg' },
-  bug:      { id: 'bug',      name: 'むし',       color: 'bg-lime-500',    textColor: 'text-white',    iconPath: '/icons/12.svg' },
-  rock:     { id: 'rock',     name: 'いわ',       color: 'bg-stone-500',   textColor: 'text-white',    iconPath: '/icons/13.svg' },
-  ghost:    { id: 'ghost',    name: 'ゴースト',   color: 'bg-violet-700',  textColor: 'text-white',    iconPath: '/icons/14.svg' },
-  dragon:   { id: 'dragon',   name: 'ドラゴン',   color: 'bg-indigo-700',  textColor: 'text-white',    iconPath: '/icons/15.svg' },
-  dark:     { id: 'dark',     name: 'あく',       color: 'bg-gray-800',    textColor: 'text-white',    iconPath: '/icons/16.svg' },
-  steel:    { id: 'steel',    name: 'はがね',     color: 'bg-slate-400',   textColor: 'text-gray-800', iconPath: '/icons/17.svg' },
-  fairy:    { id: 'fairy',    name: 'フェアリー', color: 'bg-pink-300',    textColor: 'text-gray-800', iconPath: '/icons/18.svg' },
+  normal:   { id: 'normal',   name: 'ノーマル',   color: 'bg-gray-400',    textColor: 'text-gray-800', iconPath: `${BASE_URL}icons/01.svg` },
+  fire:     { id: 'fire',     name: 'ほのお',     color: 'bg-orange-500',  textColor: 'text-white',    iconPath: `${BASE_URL}icons/02.svg` },
+  water:    { id: 'water',    name: 'みず',       color: 'bg-blue-500',    textColor: 'text-white',    iconPath: `${BASE_URL}icons/03.svg` },
+  electric: { id: 'electric', name: 'でんき',     color: 'bg-yellow-400',  textColor: 'text-gray-800', iconPath: `${BASE_URL}icons/04.svg` },
+  grass:    { id: 'grass',    name: 'くさ',       color: 'bg-green-500',   textColor: 'text-white',    iconPath: `${BASE_URL}icons/05.svg` },
+  ice:      { id: 'ice',      name: 'こおり',     color: 'bg-cyan-300',    textColor: 'text-gray-800', iconPath: `${BASE_URL}icons/06.svg` },
+  fighting: { id: 'fighting', name: 'かくとう',   color: 'bg-red-700',     textColor: 'text-white',    iconPath: `${BASE_URL}icons/07.svg` },
+  poison:   { id: 'poison',   name: 'どく',       color: 'bg-purple-500',  textColor: 'text-white',    iconPath: `${BASE_URL}icons/08.svg` },
+  ground:   { id: 'ground',   name: 'じめん',     color: 'bg-amber-600',   textColor: 'text-white',    iconPath: `${BASE_URL}icons/09.svg` },
+  flying:   { id: 'flying',   name: 'ひこう',     color: 'bg-indigo-300',  textColor: 'text-gray-800', iconPath: `${BASE_URL}icons/10.svg` },
+  psychic:  { id: 'psychic',  name: 'エスパー',   color: 'bg-pink-500',    textColor: 'text-white',    iconPath: `${BASE_URL}icons/11.svg` },
+  bug:      { id: 'bug',      name: 'むし',       color: 'bg-lime-500',    textColor: 'text-white',    iconPath: `${BASE_URL}icons/12.svg` },
+  rock:     { id: 'rock',     name: 'いわ',       color: 'bg-stone-500',   textColor: 'text-white',    iconPath: `${BASE_URL}icons/13.svg` },
+  ghost:    { id: 'ghost',    name: 'ゴースト',   color: 'bg-violet-700',  textColor: 'text-white',    iconPath: `${BASE_URL}icons/14.svg` },
+  dragon:   { id: 'dragon',   name: 'ドラゴン',   color: 'bg-indigo-700',  textColor: 'text-white',    iconPath: `${BASE_URL}icons/15.svg` },
+  dark:     { id: 'dark',     name: 'あく',       color: 'bg-gray-800',    textColor: 'text-white',    iconPath: `${BASE_URL}icons/16.svg` },
+  steel:    { id: 'steel',    name: 'はがね',     color: 'bg-slate-400',   textColor: 'text-gray-800', iconPath: `${BASE_URL}icons/17.svg` },
+  fairy:    { id: 'fairy',    name: 'フェアリー', color: 'bg-pink-300',    textColor: 'text-gray-800', iconPath: `${BASE_URL}icons/18.svg` },
 }
 
 // タイプの順番（表示用）
