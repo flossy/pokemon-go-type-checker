@@ -7,11 +7,20 @@ import SelectedTypes from './components/SelectedTypes.vue'
 import DamageVisualizer from './components/DamageVisualizer.vue'
 
 const selectedTypes = ref<PokemonType[]>([])
+const isAttackMode = ref(false)
 
 function deselectType(type: PokemonType) {
   const index = selectedTypes.value.indexOf(type)
   if (index >= 0) {
     selectedTypes.value.splice(index, 1)
+  }
+}
+
+// モード変更時の処理
+function handleModeChange() {
+  if (isAttackMode.value && selectedTypes.value.length > 1) {
+    // 攻撃モードでは1つだけ残す
+    selectedTypes.value = [selectedTypes.value[0]!]
   }
 }
 
@@ -43,17 +52,25 @@ const backgroundStyle = computed(() => {
       <div class="max-w-4xl mx-auto space-y-3">
         <!-- ブロック1: タイプ選択 -->
         <section class="bg-white rounded-xl p-6">
-          <TypeSelector v-model="selectedTypes" />
+          <TypeSelector 
+            v-model="selectedTypes" 
+            :is-attack-mode="isAttackMode"
+          />
         </section>
 
         <!-- ブロック2: 選択表示 -->
         <section class="bg-white rounded-xl p-6">
-          <SelectedTypes :selected-types="selectedTypes" @deselect="deselectType" />
+          <SelectedTypes 
+            :selected-types="selectedTypes" 
+            :is-attack-mode="isAttackMode"
+            @deselect="deselectType" 
+            @update:is-attack-mode="isAttackMode = $event; handleModeChange()"
+          />
         </section>
 
         <!-- ブロック3: ダメージ倍率表示 -->
         <section class="bg-white rounded-xl overflow-hidden">
-          <DamageVisualizer :selected-types="selectedTypes" />
+          <DamageVisualizer :selected-types="selectedTypes" :is-attack-mode="isAttackMode" />
         </section>
       </div>
     </main>

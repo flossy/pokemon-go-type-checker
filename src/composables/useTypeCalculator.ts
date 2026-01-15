@@ -1,16 +1,32 @@
 import { computed, type Ref } from 'vue'
 import type { PokemonType, DamageResult } from '../types/pokemon'
-import { TYPE_ORDER, getComboDefenseMultiplier, MULTIPLIER_INFO } from '../data/typeChart'
+import { TYPE_ORDER, getComboDefenseMultiplier, MULTIPLIER_INFO, TYPE_CHART } from '../data/typeChart'
 
-export function useTypeCalculator(selectedTypes: Ref<PokemonType[]>) {
-  // 全タイプからの被ダメージ倍率を計算
-  const damageResults = computed<DamageResult[]>(() => {
+export function useTypeCalculator(selectedTypes: Ref<PokemonType[]>, isAttackMode: Ref<boolean>) {
+  // 防御時：全タイプからの被ダメージ倍率を計算
+  const defenseResults = computed<DamageResult[]>(() => {
     if (selectedTypes.value.length === 0) return []
 
     return TYPE_ORDER.map(attackType => ({
       type: attackType,
       multiplier: getComboDefenseMultiplier(attackType, selectedTypes.value)
     }))
+  })
+
+  // 攻撃時：選択したタイプの技で各タイプへの与ダメージ倍率を計算
+  const attackResults = computed<DamageResult[]>(() => {
+    if (selectedTypes.value.length === 0) return []
+    
+    const attackType = selectedTypes.value[0]! // 攻撃モードでは1つのタイプのみ
+    return TYPE_ORDER.map(defenseType => ({
+      type: defenseType,
+      multiplier: TYPE_CHART[attackType][defenseType]
+    }))
+  })
+
+  // モードに応じて結果を切り替え
+  const damageResults = computed<DamageResult[]>(() => {
+    return isAttackMode.value ? attackResults.value : defenseResults.value
   })
 
   // 倍率カテゴリ別にグループ化

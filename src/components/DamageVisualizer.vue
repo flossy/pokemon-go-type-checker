@@ -6,20 +6,30 @@ import { TYPE_INFO } from '../data/typeChart'
 
 interface Props {
   selectedTypes: PokemonType[]
+  isAttackMode: boolean
 }
 
 const props = defineProps<Props>()
 
 const selectedTypesRef = toRef(props, 'selectedTypes')
-const { groupedResults } = useTypeCalculator(selectedTypesRef)
+const isAttackModeRef = toRef(props, 'isAttackMode')
+const { groupedResults } = useTypeCalculator(selectedTypesRef, isAttackModeRef)
+
+// 攻撃・防御モード別の表示ラベル
+const modeLabels = computed(() => ({
+  resistance: props.isAttackMode ? 'いまひとつ' : '耐性',
+  weakness: props.isAttackMode ? 'こうかばつぐん' : '弱点',
+  neutral: props.isAttackMode ? '等倍' : '等倍',
+  noEffect: props.isAttackMode ? '効果なし' : '効果なし'
+}))
 
 // 倍率カテゴリの表示設定（等倍は非表示）
 const categoryConfig = computed(() => [
-  { value: 0.244140625, label: '×0.24', color: 'bg-blue-100', textColor: 'text-blue-800', iconSize: 20 },
-  { value: 0.390625, label: '×0.39', color: 'bg-blue-200', textColor: 'text-blue-800', iconSize: 24 },
-  { value: 0.625, label: '×0.625', color: 'bg-cyan-100', textColor: 'text-cyan-800', iconSize: 28 },
-  { value: 1.6, label: '×1.6', color: 'bg-orange-100', textColor: 'text-orange-800', iconSize: 40 },
-  { value: 2.56, label: '×2.56', color: 'bg-red-100', textColor: 'text-red-800', iconSize: 48 },
+  { value: 0.244140625, label: '×0.24', color: 'bg-blue-100', textColor: 'text-blue-800', iconSize: 20, type: 'resistance' },
+  { value: 0.390625, label: '×0.39', color: 'bg-blue-200', textColor: 'text-blue-800', iconSize: 24, type: 'resistance' },
+  { value: 0.625, label: '×0.625', color: 'bg-cyan-100', textColor: 'text-cyan-800', iconSize: 28, type: 'resistance' },
+  { value: 1.6, label: '×1.6', color: 'bg-orange-100', textColor: 'text-orange-800', iconSize: 40, type: 'weakness' },
+  { value: 2.56, label: '×2.56', color: 'bg-red-100', textColor: 'text-red-800', iconSize: 48, type: 'weakness' },
 ])
 
 // 倍率ごとのアイコンサイズスタイル

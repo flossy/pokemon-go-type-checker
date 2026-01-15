@@ -2,10 +2,12 @@
 import type { PokemonType } from '../types/pokemon'
 import { TYPE_ORDER } from '../data/typeChart'
 import TypeIcon from './TypeIcon.vue'
+import { computed } from 'vue'
 
 interface Props {
   modelValue: PokemonType[]
   maxSelection?: number
+  isAttackMode: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -16,6 +18,11 @@ const emit = defineEmits<{
   'update:modelValue': [types: PokemonType[]]
 }>()
 
+// 攻撃モードでは最大選択数を1に制限
+const currentMaxSelection = computed(() => {
+  return props.isAttackMode ? 1 : props.maxSelection
+})
+
 function toggleType(type: PokemonType) {
   const current = [...props.modelValue]
   const index = current.indexOf(type)
@@ -23,7 +30,7 @@ function toggleType(type: PokemonType) {
   if (index >= 0) {
     // 選択解除
     current.splice(index, 1)
-  } else if (current.length < props.maxSelection) {
+  } else if (current.length < currentMaxSelection.value) {
     // 新規選択
     current.push(type)
   } else {
