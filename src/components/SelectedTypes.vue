@@ -22,14 +22,15 @@ function handleDeselect(type: PokemonType) {
 
 <template>
   <div class="relative flex items-center justify-center py-2">
-    <!-- ぼうぎょボタン（左側） -->
+    <!-- ぼうぎょボタン（左側、右辺が三角に尖る） -->
     <button
       :class="[
-        'absolute left-0 -ml-4 px-3 py-2 rounded-lg text-sm font-medium transition-all shadow-sm',
+        'absolute left-0 -translate-x-1/3 pl-4 pr-6 py-2 text-sm font-medium transition-all shadow-sm rounded-sm',
         !isAttackMode
           ? 'bg-blue-500 text-white'
           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
       ]"
+      style="clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%)"
       @click="emit('update:isAttackMode', false)"
     >
       ぼうぎょ
@@ -47,14 +48,15 @@ function handleDeselect(type: PokemonType) {
       <span v-if="selectedTypes.length === 0" class="text-gray-500">Select a type</span>
     </div>
 
-    <!-- こうげきボタン（右側） -->
+    <!-- こうげきボタン（右側、左辺が三角に尖る） -->
     <button
       :class="[
-        'absolute right-0 -mr-4 px-3 py-2 rounded-lg text-sm font-medium transition-all shadow-sm',
+        'absolute right-0 translate-x-1/3 pl-6 pr-4 py-2 text-sm font-medium transition-all shadow-sm rounded-sm',
         isAttackMode
           ? 'bg-red-500 text-white'
           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
       ]"
+      style="clip-path: polygon(8px 0, 100% 0, 100% 100%, 8px 100%, 0 50%)"
       @click="emit('update:isAttackMode', true)"
     >
       こうげき
