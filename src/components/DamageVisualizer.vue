@@ -15,14 +15,6 @@ const selectedTypesRef = toRef(props, 'selectedTypes')
 const isAttackModeRef = toRef(props, 'isAttackMode')
 const { groupedResults } = useTypeCalculator(selectedTypesRef, isAttackModeRef)
 
-// 攻撃・防御モード別の表示ラベル
-const modeLabels = computed(() => ({
-  resistance: props.isAttackMode ? 'いまひとつ' : '耐性',
-  weakness: props.isAttackMode ? 'こうかばつぐん' : '弱点',
-  neutral: props.isAttackMode ? '等倍' : '等倍',
-  noEffect: props.isAttackMode ? '効果なし' : '効果なし'
-}))
-
 // 倍率カテゴリの表示設定（等倍は非表示）
 const categoryConfig = computed(() => [
   { value: 0.244140625, label: '×0.24', color: 'bg-blue-100', textColor: 'text-blue-800', iconSize: 20, type: 'resistance' },
