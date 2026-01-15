@@ -23,7 +23,7 @@ function handleDeselect(type: PokemonType) {
 <template>
   <div class="flex items-center gap-6">
     <!-- 攻撃・防御モード切り替えスイッチ（固定幅） -->
-    <div class="flex-shrink-0">
+    <div class="shrink-0">
       <div class="flex flex-col space-y-1 bg-gray-100 rounded-lg p-1">
         <button
           :class="[
@@ -66,7 +66,7 @@ function handleDeselect(type: PokemonType) {
     </div>
 
     <!-- バランス用ダミー要素（スイッチと同じ幅） -->
-    <div class="flex-shrink-0 invisible">
+    <div class="shrink-0 invisible">
       <div class="flex flex-col space-y-1 bg-gray-100 rounded-lg p-1">
         <button class="px-4 py-2 rounded-md text-sm font-medium">
           ぼうぎょ
