@@ -1,26 +1,38 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { PokemonType } from './types/pokemon'
+import type { PokemonType, CalcMode } from './types/pokemon'
 import { TYPE_TINT_COLORS } from './data/typeChart'
 import TypeSelector from './components/TypeSelector.vue'
 import SelectedTypes from './components/SelectedTypes.vue'
 import DamageVisualizer from './components/DamageVisualizer.vue'
 
 const selectedTypes = ref<PokemonType[]>([])
-const isAttackMode = ref(false)
+const mode = ref<CalcMode>('defense')
 
-function deselectType(type: PokemonType) {
-  const index = selectedTypes.value.indexOf(type)
-  if (index >= 0) {
+function deselectType(type: PokemonType, index?: number) {
+  if (index !== undefined) {
+    // チームモード: インデックス指定で削除
     selectedTypes.value.splice(index, 1)
+  } else {
+    // 攻撃/防御モード: タイプで検索して削除
+    const idx = selectedTypes.value.indexOf(type)
+    if (idx >= 0) {
+      selectedTypes.value.splice(idx, 1)
+    }
   }
 }
 
 // モード変更時の処理
-function handleModeChange() {
-  if (isAttackMode.value && selectedTypes.value.length > 1) {
+function handleModeChange(newMode: CalcMode) {
+  const prevMode = mode.value
+  mode.value = newMode
+
+  if (newMode === 'attack' && selectedTypes.value.length > 1) {
     // 攻撃モードでは1つだけ残す
     selectedTypes.value = [selectedTypes.value[0]!]
+  } else if (newMode === 'defense' && prevMode === 'team' && selectedTypes.value.length > 2) {
+    // チームモードから防御モードに戻る場合、2つまでに制限
+    selectedTypes.value = selectedTypes.value.slice(0, 2)
   }
 }
 
@@ -52,25 +64,25 @@ const backgroundStyle = computed(() => {
       <div class="max-w-4xl mx-auto space-y-3">
         <!-- ブロック1: タイプ選択 -->
         <section class="bg-white rounded-xl p-6">
-          <TypeSelector 
-            v-model="selectedTypes" 
-            :is-attack-mode="isAttackMode"
+          <TypeSelector
+            v-model="selectedTypes"
+            :mode="mode"
           />
         </section>
 
         <!-- ブロック2: 選択表示 -->
         <section class="bg-white rounded-xl p-6">
-          <SelectedTypes 
-            :selected-types="selectedTypes" 
-            :is-attack-mode="isAttackMode"
-            @deselect="deselectType" 
-            @update:is-attack-mode="isAttackMode = $event; handleModeChange()"
+          <SelectedTypes
+            :selected-types="selectedTypes"
+            :mode="mode"
+            @deselect="deselectType"
+            @update:mode="handleModeChange"
           />
         </section>
 
         <!-- ブロック3: ダメージ倍率表示 -->
         <section class="bg-white rounded-xl overflow-hidden">
-          <DamageVisualizer :selected-types="selectedTypes" :is-attack-mode="isAttackMode" />
+          <DamageVisualizer :selected-types="selectedTypes" :mode="mode" />
         </section>
       </div>
     </main>

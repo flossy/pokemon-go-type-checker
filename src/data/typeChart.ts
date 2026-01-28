@@ -60,14 +60,26 @@ export const TYPE_ORDER: PokemonType[] = [
   'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy',
 ]
 
-// 倍率カテゴリ情報
+// 倍率カテゴリ情報（チームモード用に拡張）
 export const MULTIPLIER_INFO: MultiplierInfo[] = [
-  { value: 0.244140625, label: '×0.24', size: 'xs' },
-  { value: 0.390625,    label: '×0.39', size: 'sm' },
-  { value: 0.625,       label: '×0.625', size: 'md' },
+  // 極耐性（チームモード用）
+  { value: 0.05960464477539063, label: '×0.06', size: 'xs' },  // 0.625^6
+  { value: 0.095367431640625, label: '×0.10', size: 'xs' },    // 0.625^5
+  { value: 0.152587890625, label: '×0.15', size: 'xs' },       // 0.625^4
+  // 標準耐性
+  { value: 0.244140625, label: '×0.24', size: 'xs' },          // 0.625^3
+  { value: 0.390625,    label: '×0.39', size: 'sm' },          // 0.625^2
+  { value: 0.625,       label: '×0.625', size: 'md' },         // 0.625^1
+  // 等倍
   { value: 1,           label: '×1.0', size: 'lg' },
-  { value: 1.6,         label: '×1.6', size: 'xl' },
-  { value: 2.56,        label: '×2.56', size: '2xl' },
+  // 標準弱点
+  { value: 1.6,         label: '×1.6', size: 'xl' },           // 1.6^1
+  { value: 2.56,        label: '×2.56', size: '2xl' },         // 1.6^2
+  // 極弱点（チームモード用）
+  { value: 4.096,       label: '×4.10', size: '2xl' },         // 1.6^3
+  { value: 6.5536,      label: '×6.55', size: '2xl' },         // 1.6^4
+  { value: 10.48576,    label: '×10.5', size: '2xl' },         // 1.6^5
+  { value: 16.777216,   label: '×16.8', size: '2xl' },         // 1.6^6
 ]
 
 // タイプ相性チャート（攻撃タイプ → 防御タイプ）
