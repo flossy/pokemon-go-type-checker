@@ -64,60 +64,59 @@ const backgroundStyle = computed(() => {
 
 <template>
   <div class="min-h-screen text-gray-900 transition-all duration-1000 ease-in-out" :style="backgroundStyle">
-    <!-- メインコンテンツ -->
-    <main class="container mx-auto px-4 pt-4 pb-8">
-      <div class="max-w-4xl mx-auto space-y-3">
-        <!-- ブロック1: タイプ選択（モードボタン付き） -->
-        <section class="relative">
-          <!-- モード切り替えボタン（上辺に重なる） -->
-          <div class="absolute -top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-            <div class="inline-flex rounded-lg shadow-md overflow-hidden">
-              <button
-                :class="[
-                  'px-4 py-2 text-sm font-medium transition-all border-r border-gray-300',
-                  mode === 'defense'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                ]"
-                @click="handleModeChange('defense')"
-              >
-                🛡️ ぼうぎょ
-              </button>
-              <button
-                :class="[
-                  'px-4 py-2 text-sm font-medium transition-all border-r border-gray-300',
-                  mode === 'attack'
-                    ? 'bg-red-500 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                ]"
-                @click="handleModeChange('attack')"
-              >
-                ⚔️ こうげき
-              </button>
-              <button
-                :class="[
-                  'px-4 py-2 text-sm font-medium transition-all',
-                  mode === 'team'
-                    ? 'bg-green-500 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                ]"
-                @click="handleModeChange('team')"
-              >
-                👥 チーム
-              </button>
-            </div>
-          </div>
+    <!-- ステータスバー + ノッチ -->
+    <div class="safe-area-top">
+      <div class="flex justify-center">
+        <div class="notch-tab bg-gray-900 px-4 py-2.5 rounded-b-2xl flex gap-2 whitespace-nowrap">
+        <button
+            :class="[
+              'px-4 py-1.5 text-xs font-medium rounded-full transition-all',
+              mode === 'defense'
+                ? 'bg-white text-gray-900'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+            ]"
+            @click="handleModeChange('defense')"
+          >
+            ぼうぎょ
+          </button>
+          <button
+            :class="[
+              'px-4 py-1.5 text-xs font-medium rounded-full transition-all',
+              mode === 'attack'
+                ? 'bg-white text-gray-900'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+            ]"
+            @click="handleModeChange('attack')"
+          >
+            こうげき
+          </button>
+          <button
+            :class="[
+              'px-4 py-1.5 text-xs font-medium rounded-full transition-all',
+              mode === 'team'
+                ? 'bg-white text-gray-900'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+            ]"
+            @click="handleModeChange('team')"
+          >
+            チーム
+          </button>
+        </div>
+      </div>
+    </div>
 
-          <!-- タイプ選択グリッド -->
-          <div class="bg-white rounded-xl p-6 pt-8">
-            <TypeSelector
-              v-model="selectedTypes"
-              :mode="mode"
-            />
-          </div>
+    <!-- メインコンテンツ -->
+    <main class="container mx-auto px-4 pb-8">
+      <div class="max-w-4xl mx-auto space-y-3">
+        <!-- タイプ選択グリッド（ノッチと重なるように負のマージン） -->
+        <section class="bg-white rounded-xl p-6 pt-8 -mt-4">
+          <TypeSelector
+            v-model="selectedTypes"
+            :mode="mode"
+          />
         </section>
 
-        <!-- ブロック2: 選択表示 -->
+        <!-- 選択表示 -->
         <section class="bg-white rounded-xl p-6">
           <SelectedTypes
             :selected-types="selectedTypes"
@@ -127,7 +126,7 @@ const backgroundStyle = computed(() => {
           />
         </section>
 
-        <!-- ブロック3: ダメージ倍率表示 -->
+        <!-- ダメージ倍率表示 -->
         <section class="bg-white rounded-xl overflow-hidden">
           <DamageVisualizer :selected-types="selectedTypes" :mode="mode" />
         </section>
@@ -135,3 +134,38 @@ const backgroundStyle = computed(() => {
     </main>
   </div>
 </template>
+
+<style scoped>
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* メタボール風の逆角丸 */
+.notch-tab {
+  position: relative;
+}
+
+.notch-tab::before,
+.notch-tab::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  background: transparent;
+}
+
+.notch-tab::before {
+  left: -16px;
+  border-top-right-radius: 16px;
+  box-shadow: 8px 0 0 0 #111827;
+}
+
+.notch-tab::after {
+  right: -16px;
+  border-top-left-radius: 16px;
+  box-shadow: -8px 0 0 0 #111827;
+}
+</style>

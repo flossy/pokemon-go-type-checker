@@ -28,13 +28,13 @@ function handleDeselect(type: PokemonType, index?: number) {
 <template>
   <div class="relative flex flex-col items-center gap-3 py-2">
     <!-- 選択されたタイプ表示 -->
-    <div class="flex items-start gap-2 flex-wrap justify-center min-h-14">
+    <div class="flex items-start gap-2 justify-center min-h-14" :class="mode === 'team' ? 'flex-nowrap' : 'flex-wrap'">
       <template v-for="(type, index) in selectedTypes" :key="`${type}-${index}`">
         <div class="flex flex-col items-center">
           <TypeIcon :type="type" size="md" selected clickable @click="() => handleDeselect(type, index)" />
-          <span class="text-xs text-gray-600 mt-1">{{ TYPE_INFO[type].name }}</span>
+          <span class="text-[10px] text-gray-600 mt-0.5">{{ TYPE_INFO[type].name }}</span>
         </div>
-        <span v-if="index < selectedTypes.length - 1" class="text-2xl text-gray-500 h-10 flex items-center">+</span>
+        <span v-if="mode !== 'team' && index < selectedTypes.length - 1" class="text-2xl text-gray-500 h-10 flex items-center">+</span>
       </template>
       <span v-if="selectedTypes.length === 0" class="text-gray-400">タイプを選択してください</span>
     </div>
@@ -48,7 +48,7 @@ function handleDeselect(type: PokemonType, index?: number) {
       </div>
       <button
         v-if="selectedTypes.length > 0"
-        class="px-3 py-1 text-xs font-medium text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-full transition-all"
+        class="px-3 py-1 text-xs font-medium text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-full transition-all whitespace-nowrap"
         @click="emit('clear')"
       >
         ✕ クリア

@@ -6,6 +6,9 @@ import { VitePWA } from 'vite-plugin-pwa'
 // https://vite.dev/config/
 export default defineConfig({
   base: '/pokemon-go-type-checker/',
+  server: {
+    host: true, // ネットワーク経由でアクセス可能にする
+  },
   plugins: [
     vue(),
     tailwindcss(),
