@@ -1,3 +1,6 @@
+// 計算モード
+export type CalcMode = 'attack' | 'defense' | 'team'
+
 // ポケモンのタイプ（18種類）
 export type PokemonType =
   | 'normal'
