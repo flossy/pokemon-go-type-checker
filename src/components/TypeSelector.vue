@@ -27,11 +27,21 @@ const currentMaxSelection = computed(() => {
 // チームモードでは重複選択を許可
 const allowDuplicates = computed(() => props.mode === 'team')
 
+// 同じタイプの選択回数をカウント
+function countType(type: PokemonType): number {
+  return props.modelValue.filter(t => t === type).length
+}
+
 function toggleType(type: PokemonType) {
   const current = [...props.modelValue]
 
   if (allowDuplicates.value) {
-    // チームモード: 重複許可、常に追加（最大数まで）
+    // チームモード: 重複許可（ただし同タイプは最大3つまで）
+    const typeCount = countType(type)
+    if (typeCount >= 3) {
+      // 同じタイプが3つ以上あれば追加しない
+      return
+    }
     if (current.length < currentMaxSelection.value) {
       current.push(type)
     } else {

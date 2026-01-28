@@ -22,6 +22,11 @@ function deselectType(type: PokemonType, index?: number) {
   }
 }
 
+// 選択をクリア
+function clearSelection() {
+  selectedTypes.value = []
+}
+
 // モード変更時の処理
 function handleModeChange(newMode: CalcMode) {
   const prevMode = mode.value
@@ -62,12 +67,54 @@ const backgroundStyle = computed(() => {
     <!-- メインコンテンツ -->
     <main class="container mx-auto px-4 pt-4 pb-8">
       <div class="max-w-4xl mx-auto space-y-3">
-        <!-- ブロック1: タイプ選択 -->
-        <section class="bg-white rounded-xl p-6">
-          <TypeSelector
-            v-model="selectedTypes"
-            :mode="mode"
-          />
+        <!-- ブロック1: タイプ選択（モードボタン付き） -->
+        <section class="relative">
+          <!-- モード切り替えボタン（上辺に重なる） -->
+          <div class="absolute -top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+            <div class="inline-flex rounded-lg shadow-md overflow-hidden">
+              <button
+                :class="[
+                  'px-4 py-2 text-sm font-medium transition-all border-r border-gray-300',
+                  mode === 'defense'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                ]"
+                @click="handleModeChange('defense')"
+              >
+                🛡️ ぼうぎょ
+              </button>
+              <button
+                :class="[
+                  'px-4 py-2 text-sm font-medium transition-all border-r border-gray-300',
+                  mode === 'attack'
+                    ? 'bg-red-500 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                ]"
+                @click="handleModeChange('attack')"
+              >
+                ⚔️ こうげき
+              </button>
+              <button
+                :class="[
+                  'px-4 py-2 text-sm font-medium transition-all',
+                  mode === 'team'
+                    ? 'bg-green-500 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                ]"
+                @click="handleModeChange('team')"
+              >
+                👥 チーム
+              </button>
+            </div>
+          </div>
+
+          <!-- タイプ選択グリッド -->
+          <div class="bg-white rounded-xl p-6 pt-8">
+            <TypeSelector
+              v-model="selectedTypes"
+              :mode="mode"
+            />
+          </div>
         </section>
 
         <!-- ブロック2: 選択表示 -->
@@ -76,7 +123,7 @@ const backgroundStyle = computed(() => {
             :selected-types="selectedTypes"
             :mode="mode"
             @deselect="deselectType"
-            @update:mode="handleModeChange"
+            @clear="clearSelection"
           />
         </section>
 

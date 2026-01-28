@@ -12,7 +12,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   'deselect': [type: PokemonType, index?: number]
-  'update:mode': [mode: CalcMode]
+  'clear': []
 }>()
 
 function handleDeselect(type: PokemonType, index?: number) {
@@ -26,46 +26,9 @@ function handleDeselect(type: PokemonType, index?: number) {
 </script>
 
 <template>
-  <div class="relative flex flex-col items-center gap-4 py-2">
-    <!-- モード切り替えボタン -->
-    <div class="flex gap-2">
-      <button
-        :class="[
-          'px-4 py-2 text-sm font-medium transition-all shadow-sm rounded-lg',
-          mode === 'defense'
-            ? 'bg-blue-500 text-white'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-        ]"
-        @click="emit('update:mode', 'defense')"
-      >
-        🛡️ ぼうぎょ
-      </button>
-      <button
-        :class="[
-          'px-4 py-2 text-sm font-medium transition-all shadow-sm rounded-lg',
-          mode === 'attack'
-            ? 'bg-red-500 text-white'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-        ]"
-        @click="emit('update:mode', 'attack')"
-      >
-        ⚔️ こうげき
-      </button>
-      <button
-        :class="[
-          'px-4 py-2 text-sm font-medium transition-all shadow-sm rounded-lg',
-          mode === 'team'
-            ? 'bg-green-500 text-white'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-        ]"
-        @click="emit('update:mode', 'team')"
-      >
-        👥 チーム
-      </button>
-    </div>
-
+  <div class="relative flex flex-col items-center gap-3 py-2">
     <!-- 選択されたタイプ表示 -->
-    <div class="flex items-start gap-2 flex-wrap justify-center">
+    <div class="flex items-start gap-2 flex-wrap justify-center min-h-14">
       <template v-for="(type, index) in selectedTypes" :key="`${type}-${index}`">
         <div class="flex flex-col items-center">
           <TypeIcon :type="type" size="md" selected clickable @click="() => handleDeselect(type, index)" />
@@ -73,14 +36,23 @@ function handleDeselect(type: PokemonType, index?: number) {
         </div>
         <span v-if="index < selectedTypes.length - 1" class="text-2xl text-gray-500 h-10 flex items-center">+</span>
       </template>
-      <span v-if="selectedTypes.length === 0" class="text-gray-500">タイプを選択してください</span>
+      <span v-if="selectedTypes.length === 0" class="text-gray-400">タイプを選択してください</span>
     </div>
 
-    <!-- モードの説明 -->
-    <div class="text-xs text-gray-500 text-center">
-      <template v-if="mode === 'defense'">1体のタイプ（最大2つ）を選択</template>
-      <template v-else-if="mode === 'attack'">攻撃技のタイプを1つ選択</template>
-      <template v-else>チーム3体分のタイプ（最大6つ、重複可）を選択</template>
+    <!-- モードの説明 + クリアボタン -->
+    <div class="flex items-center gap-4">
+      <div class="text-xs text-gray-500">
+        <template v-if="mode === 'defense'">1体のタイプ（最大2つ）を選択</template>
+        <template v-else-if="mode === 'attack'">攻撃技のタイプを1つ選択</template>
+        <template v-else>チーム3体分のタイプ（最大6つ、同タイプ3つまで）を選択</template>
+      </div>
+      <button
+        v-if="selectedTypes.length > 0"
+        class="px-3 py-1 text-xs font-medium text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-full transition-all"
+        @click="emit('clear')"
+      >
+        ✕ クリア
+      </button>
     </div>
   </div>
 </template>
