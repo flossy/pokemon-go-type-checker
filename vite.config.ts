@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
@@ -8,6 +9,10 @@ export default defineConfig({
   base: '/pokemon-go-type-checker/',
   server: {
     host: true, // ネットワーク経由でアクセス可能にする
+  },
+  test: {
+    globals: true,
+    include: ['src/**/*.test.ts'],
   },
   plugins: [
     vue(),
