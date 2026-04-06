@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { PokemonType, CalcMode } from './types/pokemon'
+import type { PokemonType, CalcMode, TeamSlots, TeamMember } from './types/pokemon'
 import { TYPE_TINT_COLORS } from './data/typeChart'
 import TypeSelector from './components/TypeSelector.vue'
 import SelectedTypes from './components/SelectedTypes.vue'
@@ -8,12 +8,30 @@ import DamageVisualizer from './components/DamageVisualizer.vue'
 import TeamInsights from './components/TeamInsights.vue'
 
 const selectedTypes = ref<PokemonType[]>([])
+const teamSlots = ref<TeamSlots>([[], [], []])
 const mode = ref<CalcMode>('defense')
+const activeTeamSlot = ref(0)
+
+const flattenedTeamTypes = computed(() => teamSlots.value.flat())
+const teamMembers = computed<TeamMember[]>(() =>
+  teamSlots.value
+    .map((types, slot) => ({ slot, types }))
+    .filter(member => member.types.length > 0)
+)
 
 function deselectType(type: PokemonType, index?: number) {
-  if (index !== undefined) {
-    // チームモード: インデックス指定で削除
-    selectedTypes.value.splice(index, 1)
+  if (mode.value === 'team' && index !== undefined) {
+    const slot = Math.floor(index / 2)
+    const typeIndex = index % 2
+    teamSlots.value = teamSlots.value.map((types, currentSlot) => {
+      if (currentSlot !== slot) return [...types]
+      const nextTypes = [...types]
+      if (nextTypes[typeIndex] === type) {
+        nextTypes.splice(typeIndex, 1)
+      }
+      return nextTypes
+    }) as TeamSlots
+    selectedTypes.value = teamSlots.value.flat()
   } else {
     // 攻撃/防御モード: タイプで検索して削除
     const idx = selectedTypes.value.indexOf(type)
@@ -26,6 +44,8 @@ function deselectType(type: PokemonType, index?: number) {
 // 選択をクリア
 function clearSelection() {
   selectedTypes.value = []
+  teamSlots.value = [[], [], []]
+  activeTeamSlot.value = 0
 }
 
 // モード変更時の処理
@@ -33,18 +53,26 @@ function handleModeChange(newMode: CalcMode) {
   const prevMode = mode.value
   mode.value = newMode
 
-  if (newMode === 'attack' && selectedTypes.value.length > 1) {
+  if (newMode === 'attack' && prevMode === 'team') {
+    selectedTypes.value = flattenedTeamTypes.value.slice(0, 1)
+  } else if (newMode === 'attack' && selectedTypes.value.length > 1) {
     // 攻撃モードでは1つだけ残す
     selectedTypes.value = [selectedTypes.value[0]!]
-  } else if (newMode === 'defense' && prevMode === 'team' && selectedTypes.value.length > 2) {
+  } else if (newMode === 'defense' && prevMode === 'team') {
     // チームモードから防御モードに戻る場合、2つまでに制限
-    selectedTypes.value = selectedTypes.value.slice(0, 2)
+    selectedTypes.value = flattenedTeamTypes.value.slice(0, 2)
+  } else if (newMode === 'team' && prevMode !== 'team') {
+    activeTeamSlot.value = 0
   }
+}
+
+function handleTeamSlotSelect(slot: number) {
+  activeTeamSlot.value = slot
 }
 
 const backgroundStyle = computed(() => {
   const defaultColor = '#f3f4f6' // gray-100
-  const types = selectedTypes.value
+  const types = mode.value === 'team' ? teamSlots.value[activeTeamSlot.value] ?? [] : selectedTypes.value
 
   if (types.length === 0) {
     return { background: `linear-gradient(135deg, ${defaultColor} 0%, ${defaultColor} 100%)` }
@@ -77,10 +105,19 @@ const modeCopy = computed(() => {
     case 'team':
       return {
         title: 'チーム全体の偏りを簡易診断',
-        description: 'チームモードは選択した最大6タイプをまとめて集計し、累積弱点と受け先の有無を確認するモードです。3体を厳密に再現するというより、タイプ偏りの早見表として使えます。',
+        description: 'チームモードでは 3 体を個別に編集できます。各ポケモンの複合タイプを踏まえて、チーム全体の一貫や受け先を確認できます。',
       }
   }
 })
+
+function handleTeamSlotsUpdate(nextTeamSlots: TeamSlots) {
+  teamSlots.value = nextTeamSlots
+  selectedTypes.value = nextTeamSlots.flat()
+}
+
+function handleSelectedTypesUpdate(nextSelectedTypes: PokemonType[]) {
+  selectedTypes.value = nextSelectedTypes
+}
 </script>
 
 <template>
@@ -132,8 +169,12 @@ const modeCopy = computed(() => {
         <!-- タイプ選択グリッド（ノッチと重なるように負のマージン） -->
         <section class="bg-white rounded-xl p-6 pt-8 -mt-4">
           <TypeSelector
-            v-model="selectedTypes"
+            :model-value="mode === 'team' ? flattenedTeamTypes : selectedTypes"
             :mode="mode"
+            :active-team-slot="activeTeamSlot"
+            :team-slots="teamSlots"
+            @update:model-value="handleSelectedTypesUpdate"
+            @update:team-slots="handleTeamSlotsUpdate"
           />
         </section>
 
@@ -152,15 +193,18 @@ const modeCopy = computed(() => {
         <!-- 選択表示 -->
         <section class="bg-white rounded-xl p-6">
           <SelectedTypes
-            :selected-types="selectedTypes"
+            :selected-types="mode === 'team' ? flattenedTeamTypes : selectedTypes"
             :mode="mode"
+            :active-team-slot="activeTeamSlot"
+            :team-slots="teamSlots"
             @deselect="deselectType"
             @clear="clearSelection"
+            @select-team-slot="handleTeamSlotSelect"
           />
         </section>
 
         <section
-          v-if="mode === 'team' && selectedTypes.length > 0"
+          v-if="mode === 'team' && flattenedTeamTypes.length > 0"
           class="bg-white rounded-xl p-6"
         >
           <div class="mb-4">
@@ -169,12 +213,12 @@ const modeCopy = computed(() => {
               ここでは選択したタイプ群をまとめて見て、全体的に通されやすい攻撃タイプと、どこかで受けられる攻撃タイプを切り分けています。
             </p>
           </div>
-          <TeamInsights :selected-types="selectedTypes" />
+          <TeamInsights :selected-types="flattenedTeamTypes" :team-members="teamMembers" />
         </section>
 
         <!-- ダメージ倍率表示 -->
         <section class="bg-white rounded-xl overflow-hidden">
-          <DamageVisualizer :selected-types="selectedTypes" :mode="mode" />
+          <DamageVisualizer :selected-types="mode === 'team' ? flattenedTeamTypes : selectedTypes" :mode="mode" />
         </section>
       </div>
     </main>

@@ -1,8 +1,14 @@
 import { computed, type Ref } from 'vue'
-import type { PokemonType, DamageResult, CalcMode, TeamTypeDiagnostic } from '../types/pokemon'
-import { TYPE_ORDER, getComboDefenseMultiplier, getDefenseMultiplier, MULTIPLIER_INFO, TYPE_CHART } from '../data/typeChart'
+import type { PokemonType, DamageResult, CalcMode, TeamMember, TeamTypeDiagnostic } from '../types/pokemon'
+import { TYPE_ORDER, getComboDefenseMultiplier, MULTIPLIER_INFO, TYPE_CHART } from '../data/typeChart'
 
-export function useTypeCalculator(selectedTypes: Ref<PokemonType[]>, mode: Ref<CalcMode>) {
+export function useTypeCalculator(
+  selectedTypes: Ref<PokemonType[]>,
+  mode: Ref<CalcMode>,
+  teamMembersOverride?: Ref<TeamMember[]>
+) {
+  const teamMembers = teamMembersOverride ?? computed<TeamMember[]>(() => createTeamMembers(selectedTypes.value))
+
   // 防御時：全タイプからの被ダメージ倍率を計算（1体、最大2タイプ）
   const defenseResults = computed<DamageResult[]>(() => {
     if (selectedTypes.value.length === 0) return []
@@ -45,24 +51,24 @@ export function useTypeCalculator(selectedTypes: Ref<PokemonType[]>, mode: Ref<C
   })
 
   const teamDiagnostics = computed<TeamTypeDiagnostic[]>(() => {
-    if (selectedTypes.value.length === 0) return []
+    if (teamMembers.value.length === 0) return []
 
     return TYPE_ORDER.map(attackType => {
-      const slotMultipliers = selectedTypes.value.map(defenseType =>
-        getDefenseMultiplier(attackType, defenseType)
+      const memberMultipliers = teamMembers.value.map(member =>
+        getComboDefenseMultiplier(attackType, member.types)
       )
 
       return {
         type: attackType,
         totalMultiplier: getComboDefenseMultiplier(attackType, selectedTypes.value),
-        weakCount: slotMultipliers.filter(multiplier => multiplier > 1).length,
-        safeCount: slotMultipliers.filter(multiplier => multiplier <= 1).length,
+        weakCount: memberMultipliers.filter(multiplier => multiplier > 1).length,
+        safeCount: memberMultipliers.filter(multiplier => multiplier <= 1).length,
       }
     })
   })
 
   const allWeakTypes = computed(() =>
-    teamDiagnostics.value.filter(result => result.weakCount === selectedTypes.value.length)
+    teamDiagnostics.value.filter(result => result.weakCount === teamMembers.value.length)
   )
 
   const hasSwitchInTypes = computed(() =>
@@ -115,10 +121,25 @@ export function useTypeCalculator(selectedTypes: Ref<PokemonType[]>, mode: Ref<C
     weaknesses,
     resistances,
     neutral,
+    teamMembers,
     teamDiagnostics,
     allWeakTypes,
     hasSwitchInTypes,
   }
+}
+
+function createTeamMembers(selectedTypes: PokemonType[]): TeamMember[] {
+  const members: TeamMember[] = []
+
+  for (let slot = 0; slot < 3; slot += 1) {
+    const start = slot * 2
+    const types = selectedTypes.slice(start, start + 2)
+    if (types.length > 0) {
+      members.push({ slot, types })
+    }
+  }
+
+  return members
 }
 
 // 最も近い倍率カテゴリを見つける

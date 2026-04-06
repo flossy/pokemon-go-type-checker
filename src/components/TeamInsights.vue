@@ -1,24 +1,26 @@
 <script setup lang="ts">
 import { computed, toRef } from 'vue'
-import type { PokemonType } from '../types/pokemon'
+import type { PokemonType, TeamMember } from '../types/pokemon'
 import { useTypeCalculator } from '../composables/useTypeCalculator'
 import { TYPE_INFO } from '../data/typeChart'
 
 interface Props {
   selectedTypes: PokemonType[]
+  teamMembers?: TeamMember[]
 }
 
 const props = defineProps<Props>()
 
 const selectedTypesRef = toRef(props, 'selectedTypes')
 const modeRef = computed(() => 'team' as const)
-const { allWeakTypes, hasSwitchInTypes } = useTypeCalculator(selectedTypesRef, modeRef)
+const teamMembersRef = computed(() => props.teamMembers ?? [])
+const { allWeakTypes, hasSwitchInTypes } = useTypeCalculator(selectedTypesRef, modeRef, teamMembersRef)
 
 const summaryCards = computed(() => [
   {
     key: 'all-weak',
     title: '全員が弱いタイプ',
-    description: '選択したタイプ全体で見て、全スロットが弱点になっている攻撃タイプです。',
+    description: '3体すべてが弱点になる攻撃タイプです。明確な一貫ができているので、まず警戒したい候補です。',
     emptyLabel: '今のところありません',
     items: allWeakTypes.value,
     color: 'bg-red-50 border-red-100',
@@ -28,7 +30,7 @@ const summaryCards = computed(() => [
   {
     key: 'has-switch-in',
     title: '受け先ありタイプ',
-    description: '選択したタイプの中に、等倍以下で受けられるタイプが1つ以上ある攻撃タイプです。',
+    description: '3体のうち少なくとも1体は等倍以下で受けられる攻撃タイプです。引き先候補の確認に使えます。',
     emptyLabel: 'まだ受け先は見つかっていません',
     items: hasSwitchInTypes.value,
     color: 'bg-emerald-50 border-emerald-100',

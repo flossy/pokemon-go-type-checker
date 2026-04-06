@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import type { PokemonType, CalcMode } from '../types/pokemon'
+import type { PokemonType, CalcMode, TeamSlots } from '../types/pokemon'
 import { TYPE_INFO } from '../data/typeChart'
 import TypeIcon from './TypeIcon.vue'
+import TeamBuilder from './TeamBuilder.vue'
 
 interface Props {
   selectedTypes: PokemonType[]
   mode: CalcMode
+  activeTeamSlot?: number
+  teamSlots?: TeamSlots
 }
 
 const props = defineProps<Props>()
@@ -13,6 +16,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   'deselect': [type: PokemonType, index?: number]
   'clear': []
+  'selectTeamSlot': [slot: number]
 }>()
 
 function handleDeselect(type: PokemonType, index?: number) {
@@ -26,15 +30,24 @@ function handleDeselect(type: PokemonType, index?: number) {
 </script>
 
 <template>
-  <div class="relative flex flex-col items-center gap-3 py-2">
+  <TeamBuilder
+    v-if="mode === 'team'"
+    :team-slots="teamSlots ?? [[], [], []]"
+    :active-slot="activeTeamSlot ?? 0"
+    @remove="(slot, typeIndex) => handleDeselect((teamSlots ?? [[], [], []])[slot]![typeIndex]!, slot * 2 + typeIndex)"
+    @clear="emit('clear')"
+    @select-slot="emit('selectTeamSlot', $event)"
+  />
+
+  <div v-else class="relative flex flex-col items-center gap-3 py-2">
     <!-- 選択されたタイプ表示 -->
-    <div class="flex items-start gap-2 justify-center min-h-14" :class="mode === 'team' ? 'flex-nowrap' : 'flex-wrap'">
+    <div class="flex flex-wrap items-start justify-center gap-2 min-h-14">
       <template v-for="(type, index) in selectedTypes" :key="`${type}-${index}`">
         <div class="flex flex-col items-center">
           <TypeIcon :type="type" size="md" selected clickable @click="() => handleDeselect(type, index)" />
           <span class="text-[10px] text-gray-600 mt-0.5">{{ TYPE_INFO[type].name }}</span>
         </div>
-        <span v-if="mode !== 'team' && index < selectedTypes.length - 1" class="text-2xl text-gray-500 h-10 flex items-center">+</span>
+        <span v-if="index < selectedTypes.length - 1" class="text-2xl text-gray-500 h-10 flex items-center">+</span>
       </template>
       <span v-if="selectedTypes.length === 0" class="text-gray-400">タイプを選択してください</span>
     </div>

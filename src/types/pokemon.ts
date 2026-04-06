@@ -45,6 +45,13 @@ export interface TeamTypeDiagnostic {
   safeCount: number
 }
 
+export interface TeamMember {
+  slot: number
+  types: PokemonType[]
+}
+
+export type TeamSlots = [PokemonType[], PokemonType[], PokemonType[]]
+
 // 倍率カテゴリ
 export type MultiplierCategory =
   | 0.244140625  // 三重耐性 (0.625^3)
