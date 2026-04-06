@@ -1,6 +1,6 @@
 import { computed, type Ref } from 'vue'
-import type { PokemonType, DamageResult, CalcMode } from '../types/pokemon'
-import { TYPE_ORDER, getComboDefenseMultiplier, MULTIPLIER_INFO, TYPE_CHART } from '../data/typeChart'
+import type { PokemonType, DamageResult, CalcMode, TeamTypeDiagnostic } from '../types/pokemon'
+import { TYPE_ORDER, getComboDefenseMultiplier, getDefenseMultiplier, MULTIPLIER_INFO, TYPE_CHART } from '../data/typeChart'
 
 export function useTypeCalculator(selectedTypes: Ref<PokemonType[]>, mode: Ref<CalcMode>) {
   // 防御時：全タイプからの被ダメージ倍率を計算（1体、最大2タイプ）
@@ -43,6 +43,31 @@ export function useTypeCalculator(selectedTypes: Ref<PokemonType[]>, mode: Ref<C
       case 'team': return teamResults.value
     }
   })
+
+  const teamDiagnostics = computed<TeamTypeDiagnostic[]>(() => {
+    if (selectedTypes.value.length === 0) return []
+
+    return TYPE_ORDER.map(attackType => {
+      const slotMultipliers = selectedTypes.value.map(defenseType =>
+        getDefenseMultiplier(attackType, defenseType)
+      )
+
+      return {
+        type: attackType,
+        totalMultiplier: getComboDefenseMultiplier(attackType, selectedTypes.value),
+        weakCount: slotMultipliers.filter(multiplier => multiplier > 1).length,
+        safeCount: slotMultipliers.filter(multiplier => multiplier <= 1).length,
+      }
+    })
+  })
+
+  const allWeakTypes = computed(() =>
+    teamDiagnostics.value.filter(result => result.weakCount === selectedTypes.value.length)
+  )
+
+  const hasSwitchInTypes = computed(() =>
+    teamDiagnostics.value.filter(result => result.safeCount > 0)
+  )
 
   // 倍率カテゴリ別にグループ化
   const groupedResults = computed(() => {
@@ -90,6 +115,9 @@ export function useTypeCalculator(selectedTypes: Ref<PokemonType[]>, mode: Ref<C
     weaknesses,
     resistances,
     neutral,
+    teamDiagnostics,
+    allWeakTypes,
+    hasSwitchInTypes,
   }
 }
 

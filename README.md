@@ -1,5 +1,50 @@
-# Vue 3 + TypeScript + Vite
+# Pokemon GO Type Checker
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Pokemon GO のタイプ相性を、できるだけ速く確認するための Vue 3 アプリです。
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+単体の相性確認だけでなく、チーム全体のタイプ偏りをざっくり把握できるのが特徴です。
+
+## できること
+
+- `ぼうぎょ`: 1体の被ダメージ相性を確認
+- `こうげき`: 1タイプ技の通りを確認
+- `チーム`: 選択した最大6タイプをまとめて集計し、全体の偏りを見る
+
+## チームモードについて
+
+チームモードは、3体を厳密に再現する編成シミュレーターではありません。
+選択したタイプ群をまとめて集計して、次のような傾向を素早く見るための簡易診断モードです。
+
+- `全員が弱いタイプ`: 選択したタイプ全体で見て、すべてのスロットが弱点になる攻撃タイプ
+- `受け先ありタイプ`: 選択したタイプの中に、等倍以下で受けられるタイプが1つ以上ある攻撃タイプ
+- `累積倍率表示`: チーム全体で同じ弱点が重なっているかを視覚化
+
+「厳密な3体構成」よりも、「この並びは何に一貫しやすいか」を素早く把握する用途に向いています。
+
+## 技術スタック
+
+- Vue 3
+- TypeScript
+- Vite
+- Tailwind CSS
+- Vitest
+- vite-plugin-pwa
+
+## 開発
+
+```bash
+npm install
+npm run dev
+```
+
+## テスト
+
+```bash
+npm test
+```
+
+## ビルド
+
+```bash
+npm run build
+```

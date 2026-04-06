@@ -97,6 +97,21 @@ describe('useTypeCalculator', () => {
       const fire = damageResults.value.find(r => r.type === 'fire')
       expect(fire?.multiplier).toBeCloseTo(16.777216)
     })
+
+    it('全員が弱いタイプと受け先ありタイプを返す', () => {
+      const types = ref<PokemonType[]>(['grass', 'ice'])
+      const mode = ref<CalcMode>('team')
+      const { allWeakTypes, hasSwitchInTypes, teamDiagnostics } = useTypeCalculator(types, mode)
+
+      expect(allWeakTypes.value.map(r => r.type)).toContain('fire')
+      expect(hasSwitchInTypes.value.map(r => r.type)).toContain('water')
+
+      const fire = teamDiagnostics.value.find(r => r.type === 'fire')
+      expect(fire).toMatchObject({
+        weakCount: 2,
+        safeCount: 0,
+      })
+    })
   })
 
   describe('groupedResults', () => {

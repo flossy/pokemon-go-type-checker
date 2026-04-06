@@ -58,7 +58,7 @@ const visibleCategories = computed(() => {
   <div class="space-y-4">
     <!-- タイプ未選択時 -->
     <div v-if="selectedTypes.length === 0" class="text-center text-gray-500 py-8">
-      Select a type
+      タイプを選択してください
     </div>
 
     <!-- 倍率カテゴリ別表示 -->

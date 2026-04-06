@@ -44,7 +44,7 @@ function handleDeselect(type: PokemonType, index?: number) {
       <div class="text-xs text-gray-500">
         <template v-if="mode === 'defense'">1体のタイプ（最大2つ）を選択</template>
         <template v-else-if="mode === 'attack'">攻撃技のタイプを1つ選択</template>
-        <template v-else>チーム3体分のタイプ（最大6つ、同タイプ3つまで）を選択</template>
+        <template v-else>チームのタイプ傾向を見る簡易モードです。最大6タイプまで選べて、偏りと受け先をまとめて確認できます。</template>
       </div>
       <button
         v-if="selectedTypes.length > 0"

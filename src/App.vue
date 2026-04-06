@@ -5,6 +5,7 @@ import { TYPE_TINT_COLORS } from './data/typeChart'
 import TypeSelector from './components/TypeSelector.vue'
 import SelectedTypes from './components/SelectedTypes.vue'
 import DamageVisualizer from './components/DamageVisualizer.vue'
+import TeamInsights from './components/TeamInsights.vue'
 
 const selectedTypes = ref<PokemonType[]>([])
 const mode = ref<CalcMode>('defense')
@@ -59,6 +60,26 @@ const backgroundStyle = computed(() => {
     return { background: `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)` }
   }
   return { background: `linear-gradient(135deg, ${defaultColor} 0%, ${defaultColor} 100%)` }
+})
+
+const modeCopy = computed(() => {
+  switch (mode.value) {
+    case 'defense':
+      return {
+        title: '1体の受け相性を確認',
+        description: '1体分のタイプを最大2つまで選んで、どの攻撃タイプに弱いか、どこを受けられるかを確認できます。',
+      }
+    case 'attack':
+      return {
+        title: '1タイプ技の通りを確認',
+        description: '技タイプを1つ選ぶと、どの相手タイプに通りやすいかを一覧で見られます。',
+      }
+    case 'team':
+      return {
+        title: 'チーム全体の偏りを簡易診断',
+        description: 'チームモードは選択した最大6タイプをまとめて集計し、累積弱点と受け先の有無を確認するモードです。3体を厳密に再現するというより、タイプ偏りの早見表として使えます。',
+      }
+  }
 })
 </script>
 
@@ -116,6 +137,18 @@ const backgroundStyle = computed(() => {
           />
         </section>
 
+        <section class="bg-white rounded-xl p-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-gray-400">
+            {{ mode }}
+          </p>
+          <h1 class="mt-2 text-2xl font-semibold text-gray-900">
+            {{ modeCopy.title }}
+          </h1>
+          <p class="mt-2 text-sm leading-6 text-gray-600">
+            {{ modeCopy.description }}
+          </p>
+        </section>
+
         <!-- 選択表示 -->
         <section class="bg-white rounded-xl p-6">
           <SelectedTypes
@@ -124,6 +157,19 @@ const backgroundStyle = computed(() => {
             @deselect="deselectType"
             @clear="clearSelection"
           />
+        </section>
+
+        <section
+          v-if="mode === 'team' && selectedTypes.length > 0"
+          class="bg-white rounded-xl p-6"
+        >
+          <div class="mb-4">
+            <h2 class="text-lg font-semibold text-gray-900">チーム診断</h2>
+            <p class="mt-1 text-sm leading-6 text-gray-600">
+              ここでは選択したタイプ群をまとめて見て、全体的に通されやすい攻撃タイプと、どこかで受けられる攻撃タイプを切り分けています。
+            </p>
+          </div>
+          <TeamInsights :selected-types="selectedTypes" />
         </section>
 
         <!-- ダメージ倍率表示 -->

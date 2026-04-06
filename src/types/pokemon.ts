@@ -37,6 +37,14 @@ export interface DamageResult {
   multiplier: number
 }
 
+// チームモードの簡易診断結果
+export interface TeamTypeDiagnostic {
+  type: PokemonType
+  totalMultiplier: number
+  weakCount: number
+  safeCount: number
+}
+
 // 倍率カテゴリ
 export type MultiplierCategory =
   | 0.244140625  // 三重耐性 (0.625^3)
