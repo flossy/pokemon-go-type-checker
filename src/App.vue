@@ -213,7 +213,11 @@ function handleSelectedTypesUpdate(nextSelectedTypes: PokemonType[]) {
               ここでは選択したタイプ群をまとめて見て、全体的に通されやすい攻撃タイプと、どこかで受けられる攻撃タイプを切り分けています。
             </p>
           </div>
-          <TeamInsights :selected-types="flattenedTeamTypes" :team-members="teamMembers" />
+          <TeamInsights
+            :selected-types="flattenedTeamTypes"
+            :team-members="teamMembers"
+            :active-slot="activeTeamSlot"
+          />
         </section>
 
         <!-- ダメージ倍率表示 -->

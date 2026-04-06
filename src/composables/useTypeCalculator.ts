@@ -54,15 +54,20 @@ export function useTypeCalculator(
     if (teamMembers.value.length === 0) return []
 
     return TYPE_ORDER.map(attackType => {
-      const memberMultipliers = teamMembers.value.map(member =>
-        getComboDefenseMultiplier(attackType, member.types)
-      )
+      const memberMultipliers = teamMembers.value.map(member => ({
+        slot: member.slot,
+        multiplier: getComboDefenseMultiplier(attackType, member.types),
+      }))
 
       return {
         type: attackType,
         totalMultiplier: getComboDefenseMultiplier(attackType, selectedTypes.value),
-        weakCount: memberMultipliers.filter(multiplier => multiplier > 1).length,
-        safeCount: memberMultipliers.filter(multiplier => multiplier <= 1).length,
+        weakCount: memberMultipliers.filter(result => result.multiplier > 1).length,
+        safeCount: memberMultipliers.filter(result => result.multiplier <= 1).length,
+        safeOptions: memberMultipliers.filter(result => result.multiplier <= 1),
+        safeSlots: memberMultipliers
+          .filter(result => result.multiplier <= 1)
+          .map(result => result.slot),
       }
     })
   })

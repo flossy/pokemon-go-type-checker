@@ -115,7 +115,18 @@ describe('useTypeCalculator', () => {
       expect(fire).toMatchObject({
         weakCount: 1,
         safeCount: 1,
+        safeSlots: [0],
       })
+      expect(fire?.safeOptions).toEqual([
+        { slot: 0, multiplier: 1 },
+      ])
+
+      const water = teamDiagnostics.value.find(r => r.type === 'water')
+      expect(water?.safeSlots).toContain(0)
+      expect(water?.safeOptions).toEqual([
+        { slot: 0, multiplier: 0.390625 },
+        { slot: 1, multiplier: 1 },
+      ])
     })
   })
 

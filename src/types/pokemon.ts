@@ -38,11 +38,18 @@ export interface DamageResult {
 }
 
 // チームモードの簡易診断結果
+export interface TeamSafeOption {
+  slot: number
+  multiplier: number
+}
+
 export interface TeamTypeDiagnostic {
   type: PokemonType
   totalMultiplier: number
   weakCount: number
   safeCount: number
+  safeSlots: number[]
+  safeOptions: TeamSafeOption[]
 }
 
 export interface TeamMember {

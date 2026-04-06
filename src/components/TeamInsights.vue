@@ -7,6 +7,7 @@ import { TYPE_INFO } from '../data/typeChart'
 interface Props {
   selectedTypes: PokemonType[]
   teamMembers?: TeamMember[]
+  activeSlot?: number
 }
 
 const props = defineProps<Props>()
@@ -38,6 +39,12 @@ const summaryCards = computed(() => [
     textColor: 'text-emerald-700',
   },
 ])
+
+function getSafeOptionOpacity(multiplier: number): number {
+  if (multiplier <= 0.390625) return 1
+  if (multiplier <= 0.625) return 0.82
+  return 0.58
+}
 </script>
 
 <template>
@@ -59,16 +66,35 @@ const summaryCards = computed(() => [
         <div
           v-for="item in card.items"
           :key="item.type"
-          class="inline-flex items-center gap-2 rounded-full bg-white/90 px-2.5 py-1.5 shadow-sm"
+          class="rounded-2xl bg-white/90 px-2.5 py-2 shadow-sm"
         >
-          <img
-            :src="TYPE_INFO[item.type].iconPath"
-            :alt="TYPE_INFO[item.type].name"
-            class="h-5 w-5 object-contain"
-          />
-          <span class="text-xs font-medium text-gray-700">
-            {{ TYPE_INFO[item.type].name }}
-          </span>
+          <div class="inline-flex items-center gap-2">
+            <img
+              :src="TYPE_INFO[item.type].iconPath"
+              :alt="TYPE_INFO[item.type].name"
+              class="h-5 w-5 object-contain"
+            />
+            <span class="text-xs font-medium text-gray-700">
+              {{ TYPE_INFO[item.type].name }}
+            </span>
+          </div>
+          <div
+            v-if="card.key === 'has-switch-in' && item.safeOptions.length > 0"
+            class="mt-2 flex flex-wrap gap-1"
+          >
+            <span
+              v-for="option in item.safeOptions"
+              :key="`${item.type}-${option.slot}`"
+              class="rounded-full px-2 py-0.5 text-[10px] font-semibold transition-all"
+              :class="option.slot === (activeSlot ?? 0)
+                ? 'bg-gray-900 text-white shadow-sm ring-2 ring-gray-900/15'
+                : 'bg-gray-100 text-gray-500'"
+              :style="{ opacity: getSafeOptionOpacity(option.multiplier) }"
+              :title="`P${option.slot + 1}: ${option.multiplier.toFixed(3)}x`"
+            >
+              P{{ option.slot + 1 }}
+            </span>
+          </div>
         </div>
       </div>
 
