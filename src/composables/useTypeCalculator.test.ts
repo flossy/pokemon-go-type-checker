@@ -99,23 +99,26 @@ describe('useTypeCalculator', () => {
     })
 
     it('全員が弱いタイプと受け先ありタイプを返す', () => {
-      const types = ref<PokemonType[]>(['grass', 'water', 'steel'])
+      const types = ref<PokemonType[]>(['grass', 'water', 'steel', 'bug', 'ice'])
       const mode = ref<CalcMode>('team')
-      const { allWeakTypes, hasSwitchInTypes, teamDiagnostics, teamMembers } = useTypeCalculator(types, mode)
+      const { allWeakTypes, twoWeakTypes, hasSwitchInTypes, teamDiagnostics, teamMembers } = useTypeCalculator(types, mode)
 
       expect(teamMembers.value).toEqual([
         { slot: 0, types: ['grass', 'water'] },
-        { slot: 1, types: ['steel'] },
+        { slot: 1, types: ['steel', 'bug'] },
+        { slot: 2, types: ['ice'] },
       ])
 
       expect(allWeakTypes.value.map(r => r.type)).not.toContain('fire')
       expect(hasSwitchInTypes.value.map(r => r.type)).toContain('water')
+      expect(twoWeakTypes.value.map(r => r.type)).toContain('fire')
 
       const fire = teamDiagnostics.value.find(r => r.type === 'fire')
       expect(fire).toMatchObject({
-        weakCount: 1,
+        weakCount: 2,
         safeCount: 1,
         safeSlots: [0],
+        weakSlots: [1, 2],
       })
       expect(fire?.safeOptions).toEqual([
         { slot: 0, multiplier: 1 },
@@ -126,7 +129,10 @@ describe('useTypeCalculator', () => {
       expect(water?.safeOptions).toEqual([
         { slot: 0, multiplier: 0.390625 },
         { slot: 1, multiplier: 1 },
+        { slot: 2, multiplier: 1 },
       ])
+
+      expect(twoWeakTypes.value.find(r => r.type === 'fire')?.weakSlots).toEqual([1, 2])
     })
   })
 

@@ -15,20 +15,37 @@ const props = defineProps<Props>()
 const selectedTypesRef = toRef(props, 'selectedTypes')
 const modeRef = computed(() => 'team' as const)
 const teamMembersRef = computed(() => props.teamMembers ?? [])
-const { allWeakTypes, hasSwitchInTypes } = useTypeCalculator(selectedTypesRef, modeRef, teamMembersRef)
+const { allWeakTypes, twoWeakTypes, hasSwitchInTypes } = useTypeCalculator(selectedTypesRef, modeRef, teamMembersRef)
+const teamSize = computed(() => teamMembersRef.value.length)
 
-const summaryCards = computed(() => [
-  {
-    key: 'all-weak',
-    title: '全員が弱いタイプ',
-    description: '3体すべてが弱点になる攻撃タイプです。明確な一貫ができているので、まず警戒したい候補です。',
-    emptyLabel: '今のところありません',
-    items: allWeakTypes.value,
-    color: 'bg-red-50 border-red-100',
-    titleColor: 'text-red-900',
-    textColor: 'text-red-700',
-  },
-  {
+const summaryCards = computed(() => {
+  const cards = [
+    {
+      key: 'all-weak',
+      title: '全員が弱いタイプ',
+      description: '3体すべてが弱点になる攻撃タイプです。明確な一貫ができているので、まず警戒したい候補です。',
+      emptyLabel: '今のところありません',
+      items: allWeakTypes.value,
+      color: 'bg-red-50 border-red-100',
+      titleColor: 'text-red-900',
+      textColor: 'text-red-700',
+    },
+  ]
+
+  if (teamSize.value === 3) {
+    cards.push({
+      key: 'two-weak',
+      title: '2/3 が弱いタイプ',
+      description: '3体のうち 2 体が弱点になる攻撃タイプです。明確な受け先は残るものの、圧をかけられやすい帯として見られます。',
+      emptyLabel: '今のところありません',
+      items: twoWeakTypes.value,
+      color: 'bg-amber-50 border-amber-100',
+      titleColor: 'text-amber-900',
+      textColor: 'text-amber-700',
+    })
+  }
+
+  cards.push({
     key: 'has-switch-in',
     title: '受け先ありタイプ',
     description: '3体のうち少なくとも1体は等倍以下で受けられる攻撃タイプです。引き先候補の確認に使えます。',
@@ -37,13 +54,23 @@ const summaryCards = computed(() => [
     color: 'bg-emerald-50 border-emerald-100',
     titleColor: 'text-emerald-900',
     textColor: 'text-emerald-700',
-  },
-])
+  })
+
+  return cards
+})
 
 function getSafeOptionOpacity(multiplier: number): number {
   if (multiplier <= 0.390625) return 1
   if (multiplier <= 0.625) return 0.82
   return 0.58
+}
+
+function getWeakSlotClass(slot: number): string {
+  if (slot === (props.activeSlot ?? 0)) {
+    return 'bg-amber-600 text-white shadow-sm ring-2 ring-amber-600/20'
+  }
+
+  return 'bg-amber-100 text-amber-800'
 }
 </script>
 
@@ -76,6 +103,19 @@ function getSafeOptionOpacity(multiplier: number): number {
             />
             <span class="text-xs font-medium text-gray-700">
               {{ TYPE_INFO[item.type].name }}
+            </span>
+          </div>
+          <div
+            v-if="card.key === 'two-weak' && item.weakSlots.length > 0"
+            class="mt-2 flex flex-wrap gap-1"
+          >
+            <span
+              v-for="slot in item.weakSlots"
+              :key="`${item.type}-weak-${slot}`"
+              class="rounded-full px-2 py-0.5 text-[10px] font-semibold transition-all"
+              :class="getWeakSlotClass(slot)"
+            >
+              P{{ slot + 1 }}
             </span>
           </div>
           <div

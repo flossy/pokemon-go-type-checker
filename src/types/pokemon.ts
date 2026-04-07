@@ -49,6 +49,7 @@ export interface TeamTypeDiagnostic {
   weakCount: number
   safeCount: number
   safeSlots: number[]
+  weakSlots: number[]
   safeOptions: TeamSafeOption[]
 }
 

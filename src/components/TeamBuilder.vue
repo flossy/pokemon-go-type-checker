@@ -23,16 +23,20 @@ const teamMembers = computed<TeamMember[]>(() => {
     types: props.teamSlots[slot] ?? [],
   }))
 })
+
+function handleTypeClick(slot: number, typeIndex: number) {
+  emit('selectSlot', slot)
+  emit('remove', slot, typeIndex)
+}
 </script>
 
 <template>
   <div class="space-y-4">
     <div class="grid gap-3 md:grid-cols-3">
-      <button
+      <div
         v-for="member in teamMembers"
         :key="member.slot"
-        type="button"
-        class="rounded-2xl border p-4 text-left transition-all"
+        class="cursor-pointer rounded-2xl border p-4 text-left transition-all"
         :class="member.slot === activeSlot
           ? 'border-gray-900 bg-gray-50 shadow-sm'
           : 'border-gray-200 bg-white hover:border-gray-300'"
@@ -65,13 +69,17 @@ const teamMembers = computed<TeamMember[]>(() => {
               : 'border-gray-300 bg-gray-50 text-gray-400'"
           >
             <div v-if="member.types[typeIndex - 1]" class="flex flex-col items-center gap-1">
-              <TypeIcon
-                :type="member.types[typeIndex - 1]!"
-                size="md"
-                selected
-                clickable
-                @click.stop="emit('remove', member.slot, typeIndex - 1)"
-              />
+              <button
+                type="button"
+                class="rounded-full"
+                @click.stop="handleTypeClick(member.slot, typeIndex - 1)"
+              >
+                <TypeIcon
+                  :type="member.types[typeIndex - 1]!"
+                  size="md"
+                  selected
+                />
+              </button>
               <span class="text-[10px] text-gray-600">
                 {{ TYPE_INFO[member.types[typeIndex - 1]!].name }}
               </span>
@@ -81,12 +89,12 @@ const teamMembers = computed<TeamMember[]>(() => {
             </span>
           </div>
         </div>
-      </button>
+      </div>
     </div>
 
     <div class="flex items-center justify-between gap-3">
       <p class="text-xs leading-5 text-gray-500">
-        チームモードでは 3 体ぶんを個別に編集できます。編集中の枠を選んでから下のタイプ一覧を押してください。
+        チームモードでは 3 体ぶんを個別に編集できます。編集中の枠を選んでから下のタイプ一覧を押してください。同じタイプをもう一度押すと解除され、2枠埋まっている場合は左側から押し出します。
       </p>
       <button
         v-if="teamSlots.some(types => types.length > 0)"

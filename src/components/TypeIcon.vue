@@ -40,15 +40,16 @@ function handleClick() {
 </script>
 
 <template>
-  <button
-    type="button"
+  <component
+    :is="clickable ? 'button' : 'div'"
+    :type="clickable ? 'button' : undefined"
     :class="[
       'flex items-center justify-center transition-all duration-300 ease-out',
       sizeClasses,
       clickable ? 'cursor-pointer hover:opacity-80 hover:scale-105' : 'cursor-default',
       selected ? 'opacity-100 scale-110' : 'opacity-50',
     ]"
-    :disabled="!clickable"
+    :disabled="clickable ? false : undefined"
     :title="typeInfo.name"
     @click="handleClick"
   >
@@ -57,5 +58,5 @@ function handleClick() {
       :alt="typeInfo.name"
       class="w-full h-full object-contain select-none"
     />
-  </button>
+  </component>
 </template>

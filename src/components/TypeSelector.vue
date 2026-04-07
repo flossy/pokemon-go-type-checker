@@ -31,7 +31,6 @@ function toggleType(type: PokemonType) {
   if (props.mode === 'team') {
     const nextTeamSlots = updateTeamSelection(props.teamSlots ?? [[], [], []], props.activeTeamSlot ?? 0, type)
     emit('update:teamSlots', nextTeamSlots)
-    emit('update:modelValue', flattenTeamSlots(nextTeamSlots))
     return
   }
 
@@ -51,6 +50,11 @@ function toggleType(type: PokemonType) {
 }
 
 function isSelected(type: PokemonType): boolean {
+  if (props.mode === 'team') {
+    const activeTypes = props.teamSlots?.[props.activeTeamSlot ?? 0] ?? []
+    return activeTypes.includes(type)
+  }
+
   return props.modelValue.includes(type)
 }
 
@@ -64,15 +68,12 @@ function updateTeamSelection(teamSlots: TeamSlots, activeTeamSlot: number, type:
   } else if (member.length < 2) {
     member.push(type)
   } else {
-    return currentMembers
+    member.shift()
+    member.push(type)
   }
 
   currentMembers[activeTeamSlot] = member
   return currentMembers
-}
-
-function flattenTeamSlots(teamSlots: TeamSlots): PokemonType[] {
-  return teamSlots.flat()
 }
 </script>
 

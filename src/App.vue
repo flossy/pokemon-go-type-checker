@@ -112,7 +112,6 @@ const modeCopy = computed(() => {
 
 function handleTeamSlotsUpdate(nextTeamSlots: TeamSlots) {
   teamSlots.value = nextTeamSlots
-  selectedTypes.value = nextTeamSlots.flat()
 }
 
 function handleSelectedTypesUpdate(nextSelectedTypes: PokemonType[]) {

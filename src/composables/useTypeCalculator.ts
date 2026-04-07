@@ -64,6 +64,9 @@ export function useTypeCalculator(
         totalMultiplier: getComboDefenseMultiplier(attackType, selectedTypes.value),
         weakCount: memberMultipliers.filter(result => result.multiplier > 1).length,
         safeCount: memberMultipliers.filter(result => result.multiplier <= 1).length,
+        weakSlots: memberMultipliers
+          .filter(result => result.multiplier > 1)
+          .map(result => result.slot),
         safeOptions: memberMultipliers.filter(result => result.multiplier <= 1),
         safeSlots: memberMultipliers
           .filter(result => result.multiplier <= 1)
@@ -74,6 +77,10 @@ export function useTypeCalculator(
 
   const allWeakTypes = computed(() =>
     teamDiagnostics.value.filter(result => result.weakCount === teamMembers.value.length)
+  )
+
+  const twoWeakTypes = computed(() =>
+    teamDiagnostics.value.filter(result => result.weakCount === 2)
   )
 
   const hasSwitchInTypes = computed(() =>
@@ -129,6 +136,7 @@ export function useTypeCalculator(
     teamMembers,
     teamDiagnostics,
     allWeakTypes,
+    twoWeakTypes,
     hasSwitchInTypes,
   }
 }
