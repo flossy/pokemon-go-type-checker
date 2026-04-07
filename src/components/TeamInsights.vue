@@ -25,7 +25,7 @@ const summaryCards = computed(() => {
       title: '全員が弱いタイプ',
       description: '3体すべてが弱点になる攻撃タイプです。明確な一貫ができているので、まず警戒したい候補です。',
       emptyLabel: '今のところありません',
-      items: allWeakTypes.value,
+      items: sortHighRisk(allWeakTypes.value),
       color: 'bg-red-50 border-red-100',
       titleColor: 'text-red-900',
       textColor: 'text-red-700',
@@ -38,7 +38,7 @@ const summaryCards = computed(() => {
       title: '2/3 が弱いタイプ',
       description: '3体のうち 2 体が弱点になる攻撃タイプです。明確な受け先は残るものの、圧をかけられやすい帯として見られます。',
       emptyLabel: '今のところありません',
-      items: twoWeakTypes.value,
+      items: sortMediumRisk(twoWeakTypes.value),
       color: 'bg-amber-50 border-amber-100',
       titleColor: 'text-amber-900',
       textColor: 'text-amber-700',
@@ -50,7 +50,7 @@ const summaryCards = computed(() => {
     title: '受け先ありタイプ',
     description: '3体のうち少なくとも1体は等倍以下で受けられる攻撃タイプです。引き先候補の確認に使えます。',
     emptyLabel: 'まだ受け先は見つかっていません',
-    items: hasSwitchInTypes.value,
+    items: sortSwitchIns(hasSwitchInTypes.value),
     color: 'bg-emerald-50 border-emerald-100',
     titleColor: 'text-emerald-900',
     textColor: 'text-emerald-700',
@@ -72,10 +72,60 @@ function getWeakSlotClass(slot: number): string {
 
   return 'bg-amber-100 text-amber-800'
 }
+
+function sortHighRisk(items: typeof allWeakTypes.value) {
+  return [...items].sort((a, b) =>
+    b.totalMultiplier - a.totalMultiplier || b.weakCount - a.weakCount || a.type.localeCompare(b.type)
+  )
+}
+
+function sortMediumRisk(items: typeof twoWeakTypes.value) {
+  return [...items].sort((a, b) =>
+    b.totalMultiplier - a.totalMultiplier ||
+    compareSlotPriority(a.weakSlots, b.weakSlots) ||
+    a.type.localeCompare(b.type)
+  )
+}
+
+function sortSwitchIns(items: typeof hasSwitchInTypes.value) {
+  return [...items].sort((a, b) =>
+    bestSafeMultiplier(a.safeOptions) - bestSafeMultiplier(b.safeOptions) ||
+    compareSlotPriority(a.safeSlots, b.safeSlots) ||
+    a.type.localeCompare(b.type)
+  )
+}
+
+function bestSafeMultiplier(options: Array<{ multiplier: number }>) {
+  return options.reduce((best, option) => Math.min(best, option.multiplier), Number.POSITIVE_INFINITY)
+}
+
+function compareSlotPriority(left: number[], right: number[]) {
+  const active = props.activeSlot ?? 0
+  const leftHasActive = left.includes(active)
+  const rightHasActive = right.includes(active)
+
+  if (leftHasActive !== rightHasActive) {
+    return leftHasActive ? -1 : 1
+  }
+
+  return left[0]! - right[0]!
+}
 </script>
 
 <template>
-  <div class="grid gap-3 md:grid-cols-2">
+  <div class="space-y-3">
+    <div class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3">
+      <div class="flex flex-wrap items-center gap-2 text-[11px] text-gray-600">
+        <span class="font-semibold uppercase tracking-[0.18em] text-gray-400">Guide</span>
+        <span class="rounded-full bg-gray-900 px-2 py-0.5 font-semibold text-white">P{{ (activeSlot ?? 0) + 1 }}</span>
+        <span>現在フォーカス中のポケモン</span>
+        <span class="rounded-full bg-gray-100 px-2 py-0.5 font-semibold text-gray-500" :style="{ opacity: 0.58 }">等倍</span>
+        <span class="rounded-full bg-gray-100 px-2 py-0.5 font-semibold text-gray-500" :style="{ opacity: 0.82 }">耐性</span>
+        <span class="rounded-full bg-gray-100 px-2 py-0.5 font-semibold text-gray-500" :style="{ opacity: 1 }">強い耐性</span>
+      </div>
+    </div>
+
+    <div class="grid gap-3 md:grid-cols-2">
     <article
       v-for="card in summaryCards"
       :key="card.key"
@@ -142,5 +192,6 @@ function getWeakSlotClass(slot: number): string {
         {{ card.emptyLabel }}
       </p>
     </article>
+    </div>
   </div>
 </template>
